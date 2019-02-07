@@ -1,4 +1,4 @@
 {
     "port": 3001,
-    "timeForRefreshingView": 1800000 //every half hour 1000 * 60 * 30
+    "timeForRefreshingView": 60000 //every minute 1000 * 60
 }
