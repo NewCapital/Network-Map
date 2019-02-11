@@ -15,7 +15,7 @@ var DAT = DAT || {};
 
 DAT.Globe = function(container, opts) {
   opts = opts || {};
-  
+
   var colorFn = opts.colorFn || function(x) {
     var c = new THREE.Color();
     c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
@@ -175,6 +175,7 @@ DAT.Globe = function(container, opts) {
     container.addEventListener('mouseout', function() {
       overRenderer = false;
     }, false);
+    animate();
   }
 
   function addData(data, opts) {
@@ -229,6 +230,17 @@ DAT.Globe = function(container, opts) {
 
   };
 
+  function clearData() {
+      if(this.points) {
+          var selectedObject = scene.getObjectByName(this.points.name);
+          scene.remove(selectedObject);
+          // console.log("selectedObject",selectedObject)
+          selectedObject.geometry.dispose();
+          selectedObject.material.dispose();
+          selectedObject = undefined;
+          // texture.dispose();
+      }
+  }
   function createPoints() {
     if (this._baseGeometry !== undefined) {
       if (this.is_animated === false) {
@@ -253,6 +265,7 @@ DAT.Globe = function(container, opts) {
               morphTargets: true
             }));
       }
+        this.points.name = "points";
       scene.add(this.points);
     }
   }
@@ -426,7 +439,7 @@ DAT.Globe = function(container, opts) {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize( w, h );
-    renderer.domElement.style.marginTop = (window.innerHeight - renderer.domElement.height)/2 + 'px';
+    renderer.domElement.style.marginTop = (window.innerHeight - renderer.domElement.clientHeight)/2 + 'px';
   }
 
     function getPointerPos(evt) {
@@ -509,6 +522,7 @@ DAT.Globe = function(container, opts) {
   });
 
   this.addData = addData;
+  this.clearData = clearData;
   this.createPoints = createPoints;
   this.renderer = renderer;
   this.scene = scene;
