@@ -3,6 +3,7 @@
   <head>
   	<!-- Global site tag (gtag.js) - Google Analytics -->
       <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-73370264-2"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -113,6 +114,10 @@
         left: 20px;
         background: url(assets/globe/ce.png);
       }
+      .wrapper {
+          position:relative;
+          height: 96.8%;
+      }
       #container {
           position: absolute;
           top: 0;
@@ -125,15 +130,44 @@
       #container canvas {
           display: block;
       }
+      .buttons {
+          text-align: right;
+          position: absolute;
+          bottom: 2%;
+          left: 0;
+          right: 1%;
+          z-index: 1;
+      }
+      @media(max-width: 767px) {
+          .buttons {
+              /*text-align: center;*/
+          }
+      }
+      .buttons a {
+          padding: 1% 0;
+      }
+        a.active {
+            color: #007bff;
+        }
 
 
 
     </style>
   </head>
   <body>
-
-  <div id="container"></div>
-
+  <div class="buttons">
+      <a href="#" urlType="2">Combined</a> |
+      <a href="#" urlType="0">Masternodes</a> |
+      <a href="#" urlType="1">Wallets</a>
+  </div>
+  <div class="wrapper">
+    <div id="container"></div>
+  </div>
+  <script
+          src="https://code.jquery.com/jquery-3.3.1.min.js"
+          integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+          crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="assets/globe/third-party/Detector.js"></script>
   <script type="text/javascript" src="assets/globe/third-party/three.min.js"></script>
   <script type="text/javascript" src="assets/globe/third-party/Tween.js"></script>
@@ -148,41 +182,73 @@
                   timeForRefreshingView: 1800000
               }
           }
+          var interval;
+          var buttons = $(".buttons a");
+          var data = {
+              urlType: 2
+          };
+
           var container = document.getElementById('container');
           var globe = new DAT.Globe(container);
           var xhr = new XMLHttpRequest();
 
           function getData() {
-              xhr.open('GET', '/api/getmasternodes', true);
+              xhr.open('POST', '/api/getmasternodes', true);
+              xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
               xhr.onreadystatechange = function () {
 
                   if (xhr.readyState === 4 && xhr.status === 200) {
 
-
                       var data = JSON.parse(xhr.responseText).data;
+                      console.log("data",data)
+                      globe.clearData();
 
 
                       for (var i = 0; i < data.length; i++) {
-                          globe.addData(data[i][1], {format: 'magnitude', name: data[i][0]});
+                          globe.addData(data[i][1], {format: 'magnitude', name: data[i][0], animated : false});
                       }
 
 
                       globe.createPoints();
 
 
-                      globe.animate();
-                      document.body.className += ' ' + 'body-no-gif';
+//                      globe.animate();
+                      document.body.className = 'body-no-gif';
 
                   }
 
               };
-              xhr.send(null);
+              xhr.send(JSON.stringify(data));
+
+          }
+
+          function resetInterval() {
+              clearInterval(interval);
+              interval = setInterval(function () {
+                  requestAnimationFrame(getData);
+              }, settings.timeForRefreshingView);
           }
 
           getData();
-          setInterval(function () {
-              requestAnimationFrame(getData);
-          }, settings.timeForRefreshingView)
+          resetInterval();
+
+          function changeDataType(urlType) {
+              data.urlType = urlType;
+              setButtons();
+              getData();
+              resetInterval();
+          }
+
+          $(".buttons a").on('click',function(e){
+              var urlType = $(e.target).attr('urlType');
+              changeDataType(urlType);
+          })
+
+          function setButtons() {
+              buttons.removeClass('active');
+              $(".buttons a[urlType=" + data.urlType + "]").addClass('active');
+          }
+          setButtons();
       }
   </script>
 

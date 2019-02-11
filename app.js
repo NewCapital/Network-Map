@@ -15,6 +15,11 @@ app.engine("html", ejs.renderFile);
 app.set('port', process.env.PORT || settings.port);
 app.use("/public",express.static(__dirname + "/public"));
 app.use("/assets",express.static(__dirname + "/assets"));
+const mapUrls = [
+    'get_masternodes_map',
+    'get_wallets_map',
+    'get_masternodes_and_wallets_map'
+]
 app.get('/', function(req, res) {
     res.render(__dirname + "/public/index.html", {
         data: "",
@@ -25,8 +30,10 @@ app.get('/', function(req, res) {
 router.get("/", function(req, res) {
     res.json({message: "hooray! welcome to our api!"});
 });
-router.get("/getmasternodes", function(req, res) {
-   request({uri: 'https://explorer.win.win/ext/get_masternodes_and_wallets_map', json: true}, function (error, response, body) {
+router.post("/getmasternodes", function(req, res) {
+    console.log("req.body.urlType", req.body.urlType);
+    console.log("mapUrls[req.body.urlType]", mapUrls[req.body.urlType]);
+   request({uri: 'https://explorer.win.win/ext/' + mapUrls[req.body.urlType], json: true}, function (error, response, body) {
 	  // request({uri: 'https://win.win/static.json', json: true}, function (error, response, body) {
         if (response && response.statusCode == 200) {
             // console.log("response",response.statusCode);
