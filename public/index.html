@@ -131,23 +131,24 @@
           display: block;
       }
       .buttons {
-          text-align: center;
+          text-align: right;
           position: absolute;
-          top: 0;
+          bottom: 2%;
           left: 0;
-          right: 0;
+          right: 1%;
           z-index: 1;
       }
       @media(max-width: 767px) {
           .buttons {
-              text-align: center;
+              /*text-align: center;*/
           }
       }
-      .buttons button {
-        outline: none;
-        border: none;
-          box-shadow: none !important;
+      .buttons a {
+          padding: 1% 0;
       }
+        a.active {
+            color: #007bff;
+        }
 
 
 
@@ -155,9 +156,9 @@
   </head>
   <body>
   <div class="buttons">
-      <button type="button" urlType="0">Masternodes</button>
-      <button type="button" urlType="1">Wallets</button>
-      <button type="button" urlType="2">All</button>
+      <a href="#" urlType="2">Combined</a> |
+      <a href="#" urlType="0">Masternodes</a> |
+      <a href="#" urlType="1">Wallets</a>
   </div>
   <div class="wrapper">
     <div id="container"></div>
@@ -182,7 +183,7 @@
               }
           }
           var interval;
-          var buttons = $(".buttons button");
+          var buttons = $(".buttons a");
           var data = {
               urlType: 2
           };
@@ -238,14 +239,14 @@
               resetInterval();
           }
 
-          $(".buttons button").on('click',function(e){
+          $(".buttons a").on('click',function(e){
               var urlType = $(e.target).attr('urlType');
               changeDataType(urlType);
           })
 
           function setButtons() {
-              buttons.removeClass('btn-primary');
-              $(".buttons button[urlType=" + data.urlType + "]").addClass('btn-primary');
+              buttons.removeClass('active');
+              $(".buttons a[urlType=" + data.urlType + "]").addClass('active');
           }
           setButtons();
       }
