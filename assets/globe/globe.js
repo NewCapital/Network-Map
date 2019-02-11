@@ -175,7 +175,9 @@ DAT.Globe = function(container, opts) {
     container.addEventListener('mouseout', function() {
       overRenderer = false;
     }, false);
-    animate();
+    setTimeout(function(){
+        animate();
+    },500)
   }
 
   function addData(data, opts) {
